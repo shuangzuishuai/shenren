@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>审核台 · 四班神人榜</title>
+<meta name="description" content="四班神人榜审核台：审核提交的神迹。" />
+<meta name="robots" content="noindex,nofollow" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="bg-aura" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-dot" aria-hidden="true"></span>
+      <span class="brand-name">四班 · <b>神人榜</b></span>
+    </a>
+    <div class="nav-right">
+      <span class="issue">管理 · <b>ADMIN</b></span>
+      <a class="btn btn-ghost btn-sm" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        返回榜单
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap admin-main">
+  <section class="submit-head">
+    <p class="eyebrow">四班 · 聊斋志异 · <b>审核台</b></p>
+    <h1>审核台</h1>
+    <p>通过后的记录会立刻出现在榜单上；驳回的只留在后台，不对外显示。</p>
+  </section>
+
+  <!-- ============ 口令锁 ============ -->
+  <div class="lock-card" id="lockView">
+    <div class="lock-seal" aria-hidden="true">锁</div>
+    <h3>需要管理员口令</h3>
+    <p id="lockHint">口令在 config.js 里（本地模式），上线后请改到云函数环境变量。</p>
+    <form id="loginForm" autocomplete="off">
+      <input id="adminPw" type="password" placeholder="输入管理员口令" autocomplete="current-password" />
+      <button class="btn btn-primary" type="submit">进入审核台</button>
+    </form>
+    <p class="lock-err" id="lockErr" role="alert"></p>
+  </div>
+
+  <!-- ============ 审核面板 ============ -->
+  <div id="panelView" hidden>
+    <div class="admin-top">
+      <div class="admin-stats">
+        <div><b id="sPending">0</b><span>待审核</span></div>
+        <div><b id="sApproved">0</b><span>已上榜</span></div>
+        <div><b id="sRejected">0</b><span>已驳回</span></div>
+      </div>
+      <div class="admin-tools">
+        <button class="btn btn-ghost btn-sm" type="button" id="exportBtn">导出 JSON</button>
+        <button class="btn btn-ghost btn-sm" type="button" id="refreshBtn">刷新</button>
+        <button class="btn btn-ghost btn-sm" type="button" id="logoutBtn">退出</button>
+      </div>
+    </div>
+
+    <div class="seg" id="tabs" role="group" aria-label="筛选状态">
+      <button type="button" data-tab="pending" aria-pressed="true">待审核 <i>0</i></button>
+      <button type="button" data-tab="approved" aria-pressed="false">已上榜 <i>0</i></button>
+      <button type="button" data-tab="rejected" aria-pressed="false">已驳回 <i>0</i></button>
+      <button type="button" data-tab="all" aria-pressed="false">全部 <i>0</i></button>
+    </div>
+
+    <ul class="admin-list" id="adminList"></ul>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot-inner">
+    <div>
+      <div class="foot-brand">四班<span>·</span>聊斋志异</div>
+      <p class="foot-note" id="adminFootNote">
+        审核台仅用于管理本班榜单，请勿外传口令。
+      </p>
+    </div>
+    <div class="foot-meta">
+      ADMIN / EDITION 01<br />
+      RECORDED IN CLASS 4
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="app-data.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var API = window.ShenrenAPI;
+  var U = window.ShenrenUtil;
+  var esc = U.escapeHTML;
+
+  var $ = function (sel) { return document.querySelector(sel); };
+
+  var all = [];
+  var tab = "pending";
+  var busy = false;
+
+  /* ---------------- Toast ---------------- */
+
+  var toastTimer;
+  function toast(html) {
+    var el = $("#toast");
+    el.innerHTML = html;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove("show"); }, 3200);
+  }
+
+  /* ---------------- 登录 ---------------- */
+
+  function showPanel() {
+    $("#lockView").hidden = true;
+    $("#panelView").hidden = false;
+    $("#adminFootNote").textContent = API.mode === "cloud"
+      ? "数据来自云端数据库；通过/驳回会立即影响线上榜单。"
+      : "本地模式：审核只影响这台浏览器里的数据。";
+    load();
+  }
+
+  function showLock() {
+    $("#panelView").hidden = true;
+    $("#lockView").hidden = false;
+    $("#adminPw").focus();
+  }
+
+  $("#loginForm").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var pw = $("#adminPw").value;
+    if (!pw) { $("#lockErr").textContent = "请输入口令"; return; }
+
+    $("#lockErr").textContent = "";
+    API.admin.login(pw).then(function (res) {
+      if (!res.ok) throw new Error(res.error || "口令不正确");
+      $("#adminPw").value = "";
+      showPanel();
+    }, function (err) {
+      $("#lockErr").textContent = err.message || "口令不正确";
+    });
+  });
+
+  $("#logoutBtn").addEventListener("click", function () {
+    API.admin.logout();
+    all = [];
+    showLock();
+    toast("<b>已退出</b>");
+  });
+
+  /* ---------------- 列表 ---------------- */
+
+  function statusLabel(s) {
+    if (s === "approved") return "已上榜";
+    if (s === "rejected") return "已驳回";
+    return "待审核";
+  }
+
+  function renderList() {
+    var counts = { pending: 0, approved: 0, rejected: 0 };
+    all.forEach(function (e) { counts[e.status] = (counts[e.status] || 0) + 1; });
+
+    $("#sPending").textContent = counts.pending;
+    $("#sApproved").textContent = counts.approved;
+    $("#sRejected").textContent = counts.rejected;
+
+    var tabs = document.querySelectorAll("#tabs button");
+    for (var i = 0; i < tabs.length; i++) {
+      var key = tabs[i].getAttribute("data-tab");
+      tabs[i].setAttribute("aria-pressed", String(key === tab));
+      tabs[i].querySelector("i").textContent = key === "all" ? all.length : (counts[key] || 0);
+    }
+
+    var list = tab === "all" ? all.slice() : all.filter(function (e) { return e.status === tab; });
+    var box = $("#adminList");
+
+    if (!list.length) {
+      var msg = tab === "pending" ? "没有待审核的记录，喝口水吧。"
+        : tab === "approved" ? "还没有上榜的记录。"
+        : tab === "rejected" ? "没有驳回的记录。"
+        : "一条记录都没有。";
+      box.innerHTML = '<li class="admin-empty">' + msg + "</li>";
+      return;
+    }
+
+    box.innerHTML = list.map(function (e, i) {
+      var actions = '<button class="admin-btn ok" type="button" data-act="approve" data-id="' + esc(e.id) + '">通过</button>';
+      if (e.status !== "rejected") {
+        actions += '<button class="admin-btn warn" type="button" data-act="reject" data-id="' + esc(e.id) + '">' +
+          (e.status === "approved" ? "下榜" : "驳回") + "</button>";
+      } else {
+        actions += '<button class="admin-btn ok" type="button" data-act="approve" data-id="' + esc(e.id) + '">恢复</button>';
+      }
+      actions += '<button class="admin-btn del" type="button" data-act="delete" data-id="' + esc(e.id) + '">删除</button>';
+
+      return '' +
+        '<li class="admin-item">' +
+          '<div class="rank">' + String(i + 1).padStart(2, "0") + "</div>" +
+          '<div class="avatar" aria-hidden="true">' + esc(e.name.charAt(0)) + "</div>" +
+          '<div class="admin-main">' +
+            '<div class="admin-title">' +
+              "<b>" + esc(e.name) + "</b>" +
+              '<span class="status status-' + e.status + '">' + statusLabel(e.status) + "</span>" +
+            "</div>" +
+            '<div class="admin-meta">记录人 ' + esc(e.author) + " · 提交于 " + esc(U.fmtShort(e.createdAt)) + "</div>" +
+            '<ul class="admin-deeds">' +
+              e.deeds.map(function (d) { return "<li>" + esc(d) + "</li>"; }).join("") +
+            "</ul>" +
+          "</div>" +
+          '<div class="admin-actions">' + actions + "</div>" +
+        "</li>";
+    }).join("");
+  }
+
+  function load() {
+    $("#adminList").innerHTML = '<li class="admin-empty">加载中…</li>';
+    return API.admin.list("all").then(function (list) {
+      all = list;
+      renderList();
+    }, function (err) {
+      $("#adminList").innerHTML = '<li class="admin-empty">加载失败：' + esc(err.message) + "</li>";
+      if (String(err.message).indexOf("口令") > -1 || String(err.message).indexOf("401") > -1) {
+        API.admin.logout();
+        showLock();
+      }
+    });
+  }
+
+  /* ---------------- 操作 ---------------- */
+
+  document.addEventListener("click", function (ev) {
+    var btn = ev.target.closest("[data-act]");
+    if (btn) {
+      if (busy) return;
+      var action = btn.getAttribute("data-act");
+      var id = btn.getAttribute("data-id");
+      var item = all.filter(function (e) { return e.id === id; })[0];
+      if (!item) return;
+
+      if (action === "delete") {
+        if (!window.confirm("删除《" + item.name + "》这条记录？删除后无法恢复。")) return;
+      }
+
+      busy = true;
+      btn.disabled = true;
+
+      API.admin.act(action, id).then(function () {
+        var word = action === "approve" ? "已通过" : action === "reject" ? "已驳回" : "已删除";
+        toast("<b>" + word + "</b> · " + esc(item.name));
+        return load();
+      }, function (err) {
+        toast("<b>操作失败</b> · " + esc(err.message));
+      }).then(function () {
+        busy = false;
+        btn.disabled = false;
+      });
+      return;
+    }
+
+    var tabBtn = ev.target.closest("#tabs button");
+    if (tabBtn) {
+      tab = tabBtn.getAttribute("data-tab");
+      renderList();
+    }
+  });
+
+  $("#refreshBtn").addEventListener("click", function () { load(); });
+
+  $("#tabs").addEventListener("keydown", function (ev) {
+    if (ev.key === "Enter" || ev.key === " ") {
+      var b = ev.target.closest("button");
+      if (b) { ev.preventDefault(); b.click(); }
+    }
+  });
+
+  /* ---------------- 导出 ---------------- */
+
+  $("#exportBtn").addEventListener("click", function () {
+    if (!all.length) { toast("<b>没有数据</b> · 先等同学提交吧"); return; }
+
+    var payload = {
+      app: "shenren",
+      version: 2,
+      exportedAt: new Date().toISOString(),
+      entries: all.map(function (e) {
+        return { name: e.name, author: e.author, deeds: e.deeds, status: e.status, createdAt: e.createdAt };
+      })
+    };
+
+    var d = new Date();
+    var stamp = d.getFullYear() + "-" + U.pad2(d.getMonth() + 1) + "-" + U.pad2(d.getDate());
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "神人榜-" + stamp + ".json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+
+    toast("<b>已导出</b> · " + all.length + " 条记录");
+  });
+
+  /* ---------------- 启动 ---------------- */
+
+  if (API.mode === "local") {
+    $("#lockHint").textContent = "本地模式：口令写在 config.js 的 localAdminPassword（默认 admin2026，记得改）。";
+  } else {
+    $("#lockHint").textContent = "口令保存在云函数环境变量 ADMIN_CODE 里，网页端看不到。";
+  }
+
+  if (API.admin.has()) showPanel();
+  else showLock();
+})();
+</script>
+</body>
+</html>

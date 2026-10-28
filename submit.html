@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>上传神迹 · 四班神人榜</title>
+<meta name="description" content="写下一个神人的名字、事迹，署上你的名字，提交到四班神人榜。" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="bg-aura" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<!-- ============ 导航 ============ -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-dot" aria-hidden="true"></span>
+      <span class="brand-name">四班 · <b>神人榜</b></span>
+    </a>
+    <div class="nav-right">
+      <span class="issue">录入 · <b>UPLOAD</b></span>
+      <a class="btn btn-ghost btn-sm" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        返回榜单
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- ============ 标题 ============ -->
+  <section class="submit-head">
+    <p class="eyebrow">四班 · 聊斋志异 · <b>神迹录入</b></p>
+    <h1>上传神迹</h1>
+    <p>填上神人的名字、他干过的事，再署上你的名字。提交后由管理员审核，通过即上榜。</p>
+  </section>
+
+  <div class="banner" id="storageBanner" hidden>
+    <span aria-hidden="true">⚠</span>
+    <div>
+      <b>当前浏览器不允许本地保存。</b>
+      你仍然可以提交，但数据只存在本次会话里。建议改用 Chrome / Edge 打开，或等待云端模式上线。
+    </div>
+  </div>
+
+  <!-- ============ 表单 + 预览 ============ -->
+  <div class="submit-grid">
+    <form class="form-card" id="godForm" novalidate autocomplete="off">
+      <div class="field" id="fieldName">
+        <label for="fName"><span>神人名字 <i>*</i></span><span id="cName">0 / 16</span></label>
+        <input id="fName" name="name" type="text" maxlength="16" placeholder="例如：张同学 / 卷王" />
+        <p class="err">请填写神人名字</p>
+      </div>
+
+      <div class="field" id="fieldDeed">
+        <label for="fDeed"><span>神人事迹 <i>*</i></span><span id="cDeed">0 字</span></label>
+        <textarea id="fDeed" name="deeds" rows="6" maxlength="600" placeholder="一行写一条，可以写多条。&#10;例如：&#10;连续三节数学课未被点名，疑似修成分身术。&#10;上课铃响即入定，下课铃响即醒。"></textarea>
+        <p class="hint">一行一条，最多 12 条。</p>
+        <p class="err">请至少写一条事迹</p>
+      </div>
+
+      <div class="field" id="fieldAuthor">
+        <label for="fAuthor"><span>作者 / 记录人 <i>*</i></span><span id="cAuthor">0 / 16</span></label>
+        <input id="fAuthor" name="author" type="text" maxlength="16" placeholder="写下这条事迹的人" />
+        <p class="err">请填写作者</p>
+      </div>
+
+      <div class="field" id="fieldCode">
+        <label for="fCode"><span>班级暗号 <i>*</i></span><span id="cCode">防止路人乱填</span></label>
+        <input id="fCode" name="code" type="password" maxlength="32" placeholder="向管理员要暗号" autocomplete="new-password" />
+        <p class="err">暗号不正确</p>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit" id="submitBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          提交审核
+        </button>
+        <button class="btn btn-ghost" type="reset">清空重填</button>
+        <span class="form-tip">Ctrl + Enter 快速提交</span>
+      </div>
+
+      <p class="submit-note" id="submitNote" hidden></p>
+    </form>
+
+    <aside class="preview-col">
+      <div class="preview-label">预览 · 榜单卡片</div>
+      <div class="preview-card">
+        <div class="featured-inner">
+          <div class="avatar avatar-lg" id="pvAvatar" aria-hidden="true">?</div>
+          <div class="featured-main">
+            <div class="featured-top"><span class="badge badge-s">最新收录</span></div>
+            <h3 id="pvName">神人名字</h3>
+            <p class="desc" id="pvDeed">写下他干过的事，这里会实时显示。</p>
+            <div class="featured-foot">
+              <span class="author-line"><span>记录人</span><b id="pvAuthor">作者</b></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="preview-note">审核通过后，会排在榜单最上方（01 号）</p>
+    </aside>
+  </div>
+
+  <!-- ============ 已上榜 ============ -->
+  <section class="records-section">
+    <div class="records-head">
+      <h2>已上榜 <span id="recCount">加载中…</span></h2>
+      <div class="records-tools">
+        <a class="btn btn-ghost btn-sm" href="index.html">查看完整榜单</a>
+      </div>
+    </div>
+    <ul class="records" id="records"></ul>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot-inner">
+    <div>
+      <div class="foot-brand">四班<span>·</span>聊斋志异</div>
+      <p class="foot-note" id="footNote">
+        提交后先进入审核队列，管理员点通过才会公开显示。
+      </p>
+    </div>
+    <div class="foot-meta">
+      UPLOAD / EDITION 01<br />
+      RECORDED IN CLASS 4<br />
+      <a href="admin.html" style="color:#6a6460;">管理员入口</a>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="app-data.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var API = window.ShenrenAPI;
+  var U = window.ShenrenUtil;
+  var esc = U.escapeHTML;
+
+  var $ = function (sel) { return document.querySelector(sel); };
+
+  var form = $("#godForm");
+  var fName = $("#fName");
+  var fDeed = $("#fDeed");
+  var fAuthor = $("#fAuthor");
+  var fCode = $("#fCode");
+  var submitBtn = $("#submitBtn");
+
+  var fieldName = $("#fieldName");
+  var fieldDeed = $("#fieldDeed");
+  var fieldAuthor = $("#fieldAuthor");
+  var fieldCode = $("#fieldCode");
+
+  var submitting = false;
+
+  /* ---------------- 计数与预览 ---------------- */
+
+  function updateCounters() {
+    $("#cName").textContent = fName.value.trim().length + " / 16";
+    $("#cAuthor").textContent = fAuthor.value.trim().length + " / 16";
+    var lines = fDeed.value.split(/\r?\n/).filter(function (l) { return l.trim(); }).length;
+    $("#cDeed").textContent = fDeed.value.trim().length + " 字 · " + lines + " 条";
+  }
+
+  function updatePreview() {
+    var name = fName.value.trim();
+    var author = fAuthor.value.trim();
+    var first = fDeed.value.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean)[0] || "";
+
+    $("#pvName").textContent = name || "神人名字";
+    $("#pvAuthor").textContent = author || "作者";
+    $("#pvDeed").textContent = first || "写下他干过的事，这里会实时显示。";
+    $("#pvAvatar").textContent = name ? name.charAt(0) : "?";
+  }
+
+  function syncPreview() {
+    updateCounters();
+    updatePreview();
+  }
+
+  fName.addEventListener("input", syncPreview);
+  fDeed.addEventListener("input", syncPreview);
+  fAuthor.addEventListener("input", syncPreview);
+
+  /* ---------------- 校验 ---------------- */
+
+  function setInvalid(field, invalid) {
+    field.classList.toggle("is-invalid", invalid);
+  }
+
+  function validate() {
+    var name = fName.value.trim();
+    var deeds = fDeed.value.split(/\r?\n/).filter(function (l) { return l.trim(); });
+    var author = fAuthor.value.trim();
+    var code = fCode.value.trim();
+
+    var nameBad = !name;
+    var deedBad = !deeds.length;
+    var authorBad = !author;
+    var codeBad = !code;
+
+    setInvalid(fieldName, nameBad);
+    setInvalid(fieldDeed, deedBad);
+    setInvalid(fieldAuthor, authorBad);
+    setInvalid(fieldCode, codeBad);
+
+    if (nameBad) { fName.focus(); return null; }
+    if (deedBad) { fDeed.focus(); return null; }
+    if (authorBad) { fAuthor.focus(); return null; }
+    if (codeBad) { fCode.focus(); return null; }
+
+    return { name: name, deeds: deeds, author: author, code: code };
+  }
+
+  /* ---------------- Toast ---------------- */
+
+  var toastTimer;
+  function toast(html) {
+    var el = $("#toast");
+    el.innerHTML = html;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove("show"); }, 3600);
+  }
+
+  function showNote(html, bad) {
+    var el = $("#submitNote");
+    el.innerHTML = html;
+    el.hidden = false;
+    el.classList.toggle("is-bad", !!bad);
+  }
+
+  function hideNote() {
+    $("#submitNote").hidden = true;
+    $("#submitNote").classList.remove("is-bad");
+  }
+
+  /* ---------------- 已上榜 ---------------- */
+
+  function renderRecords() {
+    var box = $("#records");
+    $("#recCount").textContent = "加载中…";
+
+    API.list().then(function (list) {
+      $("#recCount").textContent = list.length + " 位";
+
+      if (!list.length) {
+        box.innerHTML = '<li class="records-empty">还没有通过审核的记录。你提交的第一条，可能就是榜一。</li>';
+        return;
+      }
+
+      box.innerHTML = list.map(function (e, i) {
+        return '' +
+          '<li class="record">' +
+            '<div class="rank">' + String(i + 1).padStart(2, "0") + "</div>" +
+            '<div class="avatar" aria-hidden="true">' + esc(e.name.charAt(0)) + "</div>" +
+            '<div class="record-main">' +
+              "<b>" + esc(e.name) + "</b>" +
+              "<em>记录人 " + esc(e.author) + " · " + esc(U.fmtShort(e.createdAt)) + "</em>" +
+              "<p>" + esc(e.deeds[0]) + "</p>" +
+            "</div>" +
+          "</li>";
+      }).join("");
+    }, function (err) {
+      $("#recCount").textContent = "—";
+      box.innerHTML = '<li class="records-empty">加载失败：' + esc(err.message) + "</li>";
+    });
+  }
+
+  /* ---------------- 提交 ---------------- */
+
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    if (submitting) return;
+
+    hideNote();
+    var data = validate();
+    if (!data) {
+      toast("<b>还差一点</b> · 请把标红的字段填完");
+      return;
+    }
+
+    submitting = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "提交中…";
+
+    API.submit(data).then(function (res) {
+      toast("<b>已提交</b> · 等待管理员审核");
+      showNote("已收到《" + esc(data.name) + "》的记录，管理员审核通过后就会出现在榜单上。", false);
+
+      form.reset();
+      syncPreview();
+      renderRecords();
+
+      if (res && res.entry) {
+        // 手机端：提交后把视线带到提示条
+        var note = $("#submitNote");
+        if (note && note.getBoundingClientRect().bottom > window.innerHeight) {
+          note.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
+    }, function (err) {
+      var msg = (err && err.message) || "提交失败";
+      if (msg.indexOf("暗号") > -1) {
+        setInvalid(fieldCode, true);
+        fCode.focus();
+      }
+      showNote("提交失败：" + esc(msg), true);
+      toast("<b>提交失败</b> · " + esc(msg));
+    }).then(function () {
+      submitting = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = "提交审核";
+    });
+  });
+
+  form.addEventListener("reset", function () {
+    setTimeout(function () {
+      [fieldName, fieldDeed, fieldAuthor, fieldCode].forEach(function (f) {
+        f.classList.remove("is-invalid");
+      });
+      hideNote();
+      syncPreview();
+    }, 0);
+  });
+
+  [fName, fDeed, fAuthor, fCode].forEach(function (el) {
+    el.addEventListener("input", function () {
+      el.closest(".field").classList.remove("is-invalid");
+    });
+  });
+
+  form.addEventListener("keydown", function (ev) {
+    if ((ev.ctrlKey || ev.metaKey) && ev.key === "Enter") {
+      ev.preventDefault();
+      form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event("submit", { cancelable: true }));
+    }
+  });
+
+  /* ---------------- 启动 ---------------- */
+
+  if (API.mode === "local" && !API.persistent) $("#storageBanner").hidden = false;
+
+  if (API.mode === "cloud") {
+    $("#footNote").textContent = "提交后先进入云端审核队列，管理员点通过才会公开显示。";
+  } else {
+    $("#footNote").textContent = "当前为本地模式：数据只存在这台设备的浏览器里，管理员审核后在本机可见。";
+  }
+
+  syncPreview();
+  renderRecords();
+})();
+</script>
+</body>
+</html>

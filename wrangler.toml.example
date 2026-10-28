@@ -1,0 +1,12 @@
+# 只有用命令行 wrangler 部署时才需要这个文件。
+# 用 Cloudflare 控制台「连接 GitHub」部署的话，不用它——
+# D1 绑定在控制台 Settings → Bindings 里加，变量名填 DB。
+
+name = "shenren"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "shenren"
+database_id = "把这里换成你的 D1 数据库 ID"

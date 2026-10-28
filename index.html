@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>四班 · 神人榜</title>
+<meta name="description" content="四班聊斋志异 · 神人榜：记录本班神人的神迹与传说。" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="bg-aura" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<!-- ============ 导航 ============ -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top">
+      <span class="brand-dot" aria-hidden="true"></span>
+      <span class="brand-name">四班 · <b>神人榜</b></span>
+    </a>
+    <nav class="nav-links" aria-label="主导航">
+      <a href="#board">本期榜单</a>
+      <a href="#rules">榜规</a>
+      <a href="#about">关于</a>
+    </nav>
+    <div class="nav-right">
+      <span class="issue">第 <b>01</b> 期</span>
+      <a class="btn btn-primary btn-sm" href="submit.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        上传神迹
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 头部 ============ -->
+<section class="hero" id="top">
+  <div class="hero-ghost" aria-hidden="true">神</div>
+  <div class="embers" id="embers" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <div class="hero-top">
+      <div>
+        <p class="eyebrow">四班 · 聊斋志异 · <b>卷之一</b></p>
+        <h1 class="title">
+          <span>神人</span><span class="slash">/</span><span>榜</span>
+        </h1>
+        <p class="lede">
+          此地不是教室，是<em>志异现场</em>。有人把早读睡成艺术，有人把食堂跑成赛道，
+          有人心跳与下课铃同频——他们的名字，值得被刻在这面墙上。
+        </p>
+        <div class="hero-meta">
+          <a class="btn btn-primary" href="submit.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+            上传一位神人
+          </a>
+          <a class="btn btn-ghost" href="#board">进入榜单 · 往下走</a>
+        </div>
+      </div>
+      <div class="seal" aria-hidden="true"><span>四班</span><span>神人</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 播报 ============ -->
+<div class="ticker" aria-label="神迹播报">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<!-- ============ 数据 ============ -->
+<div class="wrap">
+  <section class="stats" aria-label="榜单数据">
+    <div class="stat">
+      <div class="stat-num" id="statCount">0<small>位</small></div>
+      <div class="stat-label">收录神人</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="statDeeds">0<small>则</small></div>
+      <div class="stat-label">神迹记录</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="statAuthors">0<small>位</small></div>
+      <div class="stat-label">记录人</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="statLatest">—</div>
+      <div class="stat-label">最近收录</div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 榜单 ============ -->
+<main class="board wrap" id="board">
+  <div class="board-head">
+    <div class="board-title">
+      <h2>本期榜单</h2>
+      <span id="resultCount">加载中…</span>
+    </div>
+    <div class="toolbar">
+      <button class="btn btn-ghost btn-sm" id="randomBtn" type="button" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="m4 4 5 5"/></svg>
+        随机围观
+      </button>
+      <label class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="searchInput" type="search" placeholder="搜名字 / 事迹 / 作者" autocomplete="off" aria-label="搜索神人" />
+      </label>
+    </div>
+  </div>
+
+  <p class="board-note">提交后需管理员审核，通过即上榜。</p>
+
+  <div id="boardBody"></div>
+</main>
+
+<!-- ============ 榜规 ============ -->
+<section class="rules wrap" id="rules">
+  <div class="rules-head">
+    <h2>榜规</h2>
+    <span class="eyebrow">RULES OF THE ROLL</span>
+  </div>
+  <div class="rules-grid">
+    <article class="rule">
+      <div class="rule-num">RULE 01</div>
+      <h3>神迹须有人证</h3>
+      <p>每一条事迹都要署上记录人（作者）。谁写的，谁负责，也谁光荣——这是本榜唯一的实名制。</p>
+    </article>
+    <article class="rule">
+      <div class="rule-num">RULE 02</div>
+      <h3>禁止为冲榜造神迹</h3>
+      <p>为了上榜而故意在走廊上背单词、在讲台上摔一跤，榜委会一经查实，直接下榜并请喝奶茶。</p>
+    </article>
+    <article class="rule">
+      <div class="rule-num">RULE 03</div>
+      <h3>通过审核才上榜</h3>
+      <p>提交后先进入审核队列，管理员点通过，你的神迹才会出现在这里。乱写的、骂人的，一律驳回。</p>
+    </article>
+  </div>
+</section>
+
+<!-- ============ 页脚 ============ -->
+<footer id="about">
+  <div class="wrap foot-inner">
+    <div>
+      <div class="foot-brand">四班<span>·</span>聊斋志异</div>
+      <p class="foot-note">
+        本榜为班级娱乐榜单，所有称号与神迹仅供一笑，不构成任何人身评价。
+        <span id="storageNote">数据保存在本机浏览器（localStorage），不会上传到任何服务器；换设备或清缓存前请注意备份。</span>
+      </p>
+    </div>
+    <div class="foot-meta">
+      EDITION 01 / 2026.10.28<br />
+      RECORDED IN CLASS 4<br />
+      <span id="modeLabel">MODE · LOCAL</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ 弹窗 ============ -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal-box" role="document">
+    <button class="modal-close" id="modalClose" type="button" aria-label="关闭档案">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="app-data.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var API = window.ShenrenAPI;
+  var U = window.ShenrenUtil;
+  var esc = U.escapeHTML;
+
+  var state = { query: "" };
+  var source = [];
+  var results = [];
+  var lastFocused = null;
+  var loading = true;
+  var loadError = "";
+
+  var $ = function (sel, ctx) { return (ctx || document).querySelector(sel); };
+
+  function debounce(fn, wait) {
+    var t;
+    return function () {
+      var args = arguments, self = this;
+      clearTimeout(t);
+      t = setTimeout(function () { fn.apply(self, args); }, wait);
+    };
+  }
+
+  function initialOf(name) {
+    var s = String(name || "?").trim();
+    return s ? s.charAt(0) : "?";
+  }
+
+  function filtered() {
+    var q = state.query.trim().toLowerCase();
+    if (!q) return source.slice();
+    return source.filter(function (e) {
+      return [e.name, e.author, e.deeds.join(" ")].join(" ").toLowerCase().indexOf(q) > -1;
+    });
+  }
+
+  /* ---------------- 渲染 ---------------- */
+
+  function renderStats() {
+    var authors = {};
+    var deeds = 0;
+    source.forEach(function (e) {
+      authors[e.author] = 1;
+      deeds += e.deeds.length;
+    });
+
+    $("#statCount").innerHTML = source.length + "<small>位</small>";
+    $("#statDeeds").innerHTML = deeds + "<small>则</small>";
+    $("#statAuthors").innerHTML = Object.keys(authors).length + "<small>位</small>";
+
+    var latest = $("#statLatest");
+    if (source.length) {
+      var d = new Date(source[0].createdAt);
+      latest.innerHTML = U.pad2(d.getMonth() + 1) + "<small>." + U.pad2(d.getDate()) + "</small>";
+    } else {
+      latest.textContent = "—";
+    }
+  }
+
+  function renderTicker() {
+    var items;
+
+    if (loadError) {
+      items = [["异常", "榜单加载失败：" + loadError]];
+    } else if (!source.length) {
+      items = [
+        ["公告", "本榜尚未收录任何神人，等你写下第一条神迹。"],
+        ["方法", "点右上角「上传神迹」，填名字、事迹、作者即可提交。"],
+        ["审核", "提交后由管理员审核，通过后立刻出现在榜单上。"],
+        ["榜规", "每条事迹都要署名，谁写的，谁负责。"]
+      ];
+    } else {
+      items = source.slice(0, 8).map(function (e) {
+        return ["新收录", e.name + "：" + e.deeds[0]];
+      });
+      items.push(["统计", "共收录 " + source.length + " 位神人 · " + source.reduce(function (n, e) { return n + e.deeds.length; }, 0) + " 则神迹。"]);
+    }
+
+    var html = items.map(function (pair) {
+      return '<div class="ticker-item"><i>' + esc(pair[0]) + "</i>" + esc(pair[1]) + "</div>";
+    }).join("");
+
+    $("#tickerTrack").innerHTML = html + html;
+  }
+
+  function loadingHTML() {
+    return '' +
+      '<div class="skeleton skeleton-featured" aria-hidden="true"></div>' +
+      '<div class="skeleton skeleton-row" aria-hidden="true"></div>' +
+      '<div class="skeleton skeleton-row" aria-hidden="true"></div>';
+  }
+
+  function errorHTML() {
+    return '' +
+      '<div class="state-error">' +
+        '<b>榜单没能加载出来</b>' +
+        "<p>" + esc(loadError) + "</p>" +
+        '<button class="btn btn-ghost btn-sm" type="button" data-retry>重新加载</button>' +
+      "</div>";
+  }
+
+  function emptyHTML() {
+    return '' +
+      '<div class="empty-hero">' +
+        '<div class="empty-seal" aria-hidden="true">空</div>' +
+        '<h3>榜上无人，静候神迹</h3>' +
+        '<p>这里还没有通过审核的记录。第一位上榜的人，将由你亲手写下。</p>' +
+        '<div class="empty-actions">' +
+          '<a class="btn btn-primary" href="submit.html">上传第一位神人</a>' +
+        '</div>' +
+        '<p class="empty-hint">提交时需要班级暗号，通过审核后才会显示</p>' +
+      '</div>';
+  }
+
+  function featuredHTML(e) {
+    return '' +
+      '<article class="featured">' +
+        '<div class="featured-rank" aria-hidden="true">01</div>' +
+        '<div class="featured-inner">' +
+          '<div class="avatar avatar-lg" aria-hidden="true">' + esc(initialOf(e.name)) + "</div>" +
+          '<div class="featured-main">' +
+            '<div class="featured-top">' +
+              '<span class="badge badge-s">最新收录</span>' +
+              '<span class="field-tag">NO.001</span>' +
+            "</div>" +
+            "<h3>" + esc(e.name) + "</h3>" +
+            '<p class="desc">' + esc(e.deeds[0]) + "</p>" +
+            '<div class="featured-foot">' +
+              '<span class="author-line"><span>记录人</span><b>' + esc(e.author) + "</b></span>" +
+              '<button class="btn btn-primary" type="button" data-open="0">查看神迹档案</button>' +
+            "</div>" +
+          "</div>" +
+        "</div>" +
+      "</article>";
+  }
+
+  function rowHTML(e, rank) {
+    var count = e.deeds.length;
+    return '' +
+      "<li>" +
+        '<article class="row" role="button" tabindex="0" data-open="' + (rank - 1) + '" ' +
+          'aria-label="' + esc(e.name) + "，记录人 " + esc(e.author) + '">' +
+          '<div class="rank">' + U.pad2(rank) + "</div>" +
+          '<div class="avatar" aria-hidden="true">' + esc(initialOf(e.name)) + "</div>" +
+          '<div class="row-main">' +
+            '<div class="row-name"><b>' + esc(e.name) + "</b><em>" + count + " 则神迹</em></div>" +
+            '<div class="row-desc">' + esc(e.deeds[0]) + "</div>" +
+          "</div>" +
+          '<div class="row-author"><span>记录人</span><b>' + esc(e.author) + "</b>" +
+            '<svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>' +
+          "</div>" +
+        "</article>" +
+      "</li>";
+  }
+
+  function renderBoard() {
+    results = filtered();
+    var body = $("#boardBody");
+
+    $("#randomBtn").hidden = results.length === 0;
+    $("#resultCount").textContent = loading ? "加载中…" : "共 " + results.length + " 位";
+
+    if (loading) { body.innerHTML = loadingHTML(); return; }
+    if (loadError) { body.innerHTML = errorHTML(); return; }
+
+    if (!source.length) { body.innerHTML = emptyHTML(); return; }
+    if (!results.length) {
+      body.innerHTML = '<div class="empty"><b>查无此人</b>可能是这位神人过于低调，或者你搜错了字。</div>';
+      return;
+    }
+
+    var html = featuredHTML(results[0]);
+    if (results.length > 1) {
+      html += '<ol class="list" aria-label="神人排名列表">' +
+        results.slice(1).map(function (e, i) { return rowHTML(e, i + 2); }).join("") +
+        "</ol>";
+    }
+    body.innerHTML = html;
+
+    var rows = body.querySelectorAll(".row");
+    for (var i = 0; i < rows.length; i++) {
+      rows[i].style.animationDelay = Math.min(i * 45, 400) + "ms";
+    }
+  }
+
+  function refresh() {
+    loading = true;
+    loadError = "";
+    renderBoard();
+
+    return API.list().then(function (list) {
+      source = list;
+      loading = false;
+    }, function (err) {
+      source = [];
+      loading = false;
+      loadError = (err && err.message) || "未知错误";
+    }).then(function () {
+      renderStats();
+      renderTicker();
+      renderBoard();
+    });
+  }
+
+  /* ---------------- 弹窗 ---------------- */
+
+  var modal = $("#modal");
+
+  function openModal(index) {
+    var e = results[index];
+    if (!e) return;
+
+    var rank = index + 1;
+    $("#modalContent").innerHTML = '' +
+      '<div class="modal-top">' +
+        '<div class="modal-id">' +
+          '<div class="avatar avatar-lg" aria-hidden="true">' + esc(initialOf(e.name)) + "</div>" +
+          "<div>" +
+            '<div class="featured-top" style="margin-bottom:8px;">' +
+              '<span class="badge badge-s">NO.' + String(rank).padStart(3, "0") + "</span>" +
+              '<span class="field-tag">收录于 ' + esc(U.fmtDate(e.createdAt)) + "</span>" +
+            "</div>" +
+            '<h3 id="modalTitle">' + esc(e.name) + "</h3>" +
+          "</div>" +
+        "</div>" +
+        '<div class="modal-tags">' +
+          '<span class="field-tag">记录人 · ' + esc(e.author) + "</span>" +
+          '<span class="field-tag">' + e.deeds.length + " 则神迹</span>" +
+        "</div>" +
+      "</div>" +
+      '<div class="modal-body">' +
+        '<div class="deeds">' +
+          "<h4>神迹记录 / " + e.deeds.length + " 则</h4>" +
+          "<ul>" + e.deeds.map(function (d, i) {
+            return "<li><time>" + U.pad2(i + 1) + "</time><span>" + esc(d) + "</span></li>";
+          }).join("") + "</ul>" +
+        "</div>" +
+      "</div>";
+
+    lastFocused = document.activeElement;
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("is-locked");
+    $("#modalClose").focus();
+  }
+
+  function closeModal() {
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("is-locked");
+    if (lastFocused && lastFocused.focus) lastFocused.focus();
+  }
+
+  /* ---------------- Toast ---------------- */
+
+  var toastTimer;
+  function toast(html) {
+    var el = $("#toast");
+    el.innerHTML = html;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove("show"); }, 3200);
+  }
+
+  /* ---------------- 事件 ---------------- */
+
+  document.addEventListener("click", function (ev) {
+    var opener = ev.target.closest("[data-open]");
+    if (opener) { openModal(Number(opener.getAttribute("data-open"))); return; }
+
+    if (ev.target.closest("[data-retry]")) { refresh(); return; }
+    if (ev.target.closest("#modalClose")) { closeModal(); }
+  });
+
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape" && modal.classList.contains("is-open")) closeModal();
+
+    var row = ev.target.closest && ev.target.closest(".row");
+    if (row && (ev.key === "Enter" || ev.key === " ")) {
+      ev.preventDefault();
+      openModal(Number(row.getAttribute("data-open")));
+    }
+
+    if (ev.key === "Tab" && modal.classList.contains("is-open")) {
+      var focusables = modal.querySelectorAll("button, [href], input, [tabindex]:not([tabindex='-1'])");
+      if (!focusables.length) return;
+      var first = focusables[0];
+      var last = focusables[focusables.length - 1];
+      if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
+      else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
+    }
+  });
+
+  modal.addEventListener("click", function (ev) { if (ev.target === modal) closeModal(); });
+
+  $("#searchInput").addEventListener("input", debounce(function (ev) {
+    state.query = ev.target.value;
+    renderBoard();
+  }, 90));
+
+  $("#randomBtn").addEventListener("click", function () {
+    if (!results.length) return;
+    openModal(Math.floor(Math.random() * results.length));
+  });
+
+  window.addEventListener("storage", function (ev) {
+    if (!ev.key || ev.key === "shenren.entries.v2" || ev.key === "shenren.entries.v1") refresh();
+  });
+  window.addEventListener("pageshow", function (ev) { if (ev.persisted) refresh(); });
+
+  /* ---------------- 余烬粒子 ---------------- */
+
+  function spawnEmbers() {
+    var box = $("#embers");
+    if (!box) return;
+    var count = window.innerWidth < 720 ? 10 : 20;
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < count; i++) {
+      var s = document.createElement("span");
+      var size = 2 + Math.random() * 4;
+      s.className = "ember";
+      s.style.left = (Math.random() * 100) + "%";
+      s.style.width = size + "px";
+      s.style.height = size + "px";
+      s.style.animationDuration = (13 + Math.random() * 15) + "s";
+      s.style.animationDelay = (Math.random() * 10) + "s";
+      s.style.setProperty("--drift", ((Math.random() - 0.5) * 140) + "px");
+      frag.appendChild(s);
+    }
+    box.appendChild(frag);
+  }
+
+  /* ---------------- 启动 ---------------- */
+
+  $("#modeLabel").textContent = API.mode === "cloud" ? "MODE · CLOUD" : "MODE · LOCAL";
+
+  if (API.mode === "cloud") {
+    $("#storageNote").textContent = "数据保存在云端，全班同学看到的是同一份榜单。";
+  } else {
+    $("#storageNote").textContent = "当前为本地模式：数据只存在这台设备的浏览器里，换设备或清缓存前请注意备份。";
+    if (!API.persistent) {
+      $("#storageNote").textContent = "当前浏览器禁止本地存储，数据只存在于本次会话中，刷新即丢失。";
+    }
+  }
+
+  spawnEmbers();
+  refresh();
+})();
+</script>
+</body>
+</html>
