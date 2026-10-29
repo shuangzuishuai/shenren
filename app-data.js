@@ -33,7 +33,7 @@
     var out = [];
     for (var i = 0; i < arr.length; i++) {
       var t = String(arr[i] || "").replace(/^[-*·•]\s*/, "").replace(/\s+/g, " ").trim();
-      if (t) out.push(t.slice(0, 160));
+      if (t) out.push(t.slice(0, 600));
       if (out.length >= 12) break;
     }
     return out;

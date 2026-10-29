@@ -212,7 +212,7 @@ function parseDeeds(input) {
   const arr = Array.isArray(input) ? input : String(input || "").split(/\r?\n/);
   const out = [];
   for (const raw of arr) {
-    const t = cleanText(String(raw || "").replace(/^[-*·•]\s*/, ""), 160);
+    const t = cleanText(String(raw || "").replace(/^[-*·•]\s*/, ""), 600);
     if (t) out.push(t);
     if (out.length >= 12) break;
   }

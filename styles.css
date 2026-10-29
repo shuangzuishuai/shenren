@@ -379,6 +379,8 @@ img{max-width:100%;display:block;}
 }
 .featured p.desc{
   margin-top:14px;color:var(--text-2);font-size:14.5px;max-width:52ch;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  white-space:pre-wrap;
 }
 .featured-foot{
   margin-top:26px;display:flex;align-items:center;gap:26px;flex-wrap:wrap;
@@ -632,7 +634,7 @@ footer{
 .preview-card .featured-inner{gap:18px;}
 .preview-card .avatar-lg{width:70px;height:70px;font-size:28px;}
 .preview-card h3{font-size:26px;}
-.preview-card .desc{margin-top:12px;font-size:13.5px;min-height:46px;}
+.preview-card .desc{margin-top:12px;font-size:13.5px;min-height:46px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 .preview-card .featured-foot{margin-top:20px;justify-content:space-between;}
 .preview-note{
   margin-top:12px;font-size:11px;color:#5f5955;font-family:var(--mono);letter-spacing:.1em;
