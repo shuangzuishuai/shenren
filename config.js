@@ -18,11 +18,11 @@
    ============================================================ */
 window.SHENREN_CONFIG = {
   // "local" 或 "cloud"
-  mode: "local",
+  mode: "cloud",
 
   // 云端模式的接口地址，例如：
   // "https://shenren-1g2h3j4k.service.tcloudbase.com/api"
-  apiBase: "",
+  apiBase: "/api",
 
   // 本地模式用的班级暗号（云端模式下不用这个，改云函数环境变量）
   localClassCode: "shenren2026",
