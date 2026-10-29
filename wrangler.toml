@@ -1,24 +1,12 @@
-# Cloudflare Workers 配置（Workers + 静态资源）
-# 你的项目是 Worker 项目，构建命令是 `npx wrangler deploy`，会读这个文件。
-
 name = "shenren"
 compatibility_date = "2025-01-01"
 main = "worker/index.js"
 
-# 把仓库根目录当作静态网站（index.html / styles.css …）
-# .assetsignore 里的目录不会被打包上传
 [assets]
 directory = "."
 binding = "ASSETS"
 
-
-# ============================================================
-# D1 数据库绑定
-# 先去 Cloudflare 建好 D1（名字 shenren），执行 schema.sql，
-# 然后到 D1 页面复制 Database ID，把下面四行的注释去掉并填进去。
-#
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "shenren"
-# database_id = "把这里换成你的 D1 Database ID"
-# ============================================================
+[[d1_databases]]
+binding = "DB"
+database_name = "shenren"
+database_id = "b3781b0d-2009-4f45-93a9-e10eaeb772f8"
