@@ -13,8 +13,19 @@
 
 const RATE_WINDOW_MS = 30 * 1000;
 
+// 首次打开 /api/setup 时执行，自动建表；可重复执行，不会影响已有数据
+const SCHEMA_STATEMENTS = [
+  "CREATE TABLE IF NOT EXISTS entries (id TEXT PRIMARY KEY, name TEXT NOT NULL, author TEXT NOT NULL, deeds TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created_at INTEGER NOT NULL, reviewed_at INTEGER, ip_hash TEXT)",
+  "CREATE INDEX IF NOT EXISTS idx_entries_status ON entries (status, created_at DESC)",
+  "CREATE TABLE IF NOT EXISTS rate (ip TEXT PRIMARY KEY, at INTEGER NOT NULL)"
+];
+
 export async function handleApi(request, env) {
   try {
+    if (!env.DB) {
+      return fail(env, "还没绑定数据库：Settings → Bindings 里加一个 D1 database，变量名填 DB", 500);
+    }
+
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: cors(env) });
     }
@@ -22,6 +33,16 @@ export async function handleApi(request, env) {
     const url = new URL(request.url);
     const path = url.pathname.replace(/^\/api/, "") || "/";
     const method = request.method.toUpperCase();
+
+    // 一键建表：浏览器打开 /api/setup 即可，可重复执行
+    if (path === "/setup") {
+      await env.DB.batch(SCHEMA_STATEMENTS.map((sql) => env.DB.prepare(sql)));
+      const tables = await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
+      const names = (tables.results || [])
+        .map((row) => row.name)
+        .filter((n) => n === "entries" || n === "rate");
+      return ok(env, { message: "数据库已就绪", tables: names });
+    }
 
     if (path === "/entries") {
       if (method === "POST") return await submit(request, env);
@@ -50,6 +71,10 @@ export async function handleApi(request, env) {
 
     return fail(env, "接口不存在", 404);
   } catch (err) {
+    const message = String((err && err.message) || "");
+    if (/no such table/i.test(message)) {
+      return fail(env, "数据库还没建表：用浏览器打开本站的 /api/setup 就会自动建好", 500);
+    }
     console.error("[shenren-api]", err && err.stack ? err.stack : err);
     return fail(env, "服务器开小差了，稍后再试", 500);
   }
