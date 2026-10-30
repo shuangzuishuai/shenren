@@ -111,6 +111,8 @@
     </div>
   </div>
 
+  <div class="seg" id="catFilter" role="group" aria-label="按分类筛选"></div>
+
   <p class="board-note">提交后需管理员审核，通过即上榜。</p>
 
   <div id="boardBody"></div>
@@ -181,7 +183,7 @@
   var U = window.ShenrenUtil;
   var esc = U.escapeHTML;
 
-  var state = { query: "" };
+  var state = { query: "", cat: "全部" };
   var source = [];
   var results = [];
   var lastFocused = null;
@@ -206,10 +208,33 @@
 
   function filtered() {
     var q = state.query.trim().toLowerCase();
-    if (!q) return source.slice();
-    return source.filter(function (e) {
-      return [e.name, e.author, e.deeds.join(" ")].join(" ").toLowerCase().indexOf(q) > -1;
+    var list = source;
+    if (state.cat !== "全部") {
+      list = list.filter(function (e) { return e.category === state.cat; });
+    }
+    if (!q) return list.slice();
+    return list.filter(function (e) {
+      return [e.name, e.author, e.category, e.deeds.join(" ")].join(" ").toLowerCase().indexOf(q) > -1;
     });
+  }
+
+  function renderCatFilter() {
+    var box = $("#catFilter");
+    if (!source.length) {
+      box.hidden = true;
+      box.innerHTML = "";
+      return;
+    }
+    box.hidden = false;
+
+    var counts = { "全部": source.length };
+    ["四班", "其他班", "老师"].forEach(function (c) { counts[c] = 0; });
+    source.forEach(function (e) { counts[e.category] = (counts[e.category] || 0) + 1; });
+
+    box.innerHTML = ["全部", "四班", "其他班", "老师"].map(function (c) {
+      return '<button type="button" data-cat="' + c + '" aria-pressed="' +
+        String(state.cat === c) + '">' + c + " <i>" + (counts[c] || 0) + "</i></button>";
+    }).join("");
   }
 
   /* ---------------- 渲染 ---------------- */
@@ -300,6 +325,7 @@
             '<div class="featured-top">' +
               '<span class="badge badge-s">最新收录</span>' +
               '<span class="field-tag">NO.001</span>' +
+              '<span class="field-tag cat-tag">' + esc(e.category) + "</span>" +
             "</div>" +
             "<h3>" + esc(e.name) + "</h3>" +
             '<p class="desc">' + esc(e.deeds[0]) + "</p>" +
@@ -321,7 +347,8 @@
           '<div class="rank">' + U.pad2(rank) + "</div>" +
           '<div class="avatar" aria-hidden="true">' + esc(initialOf(e.name)) + "</div>" +
           '<div class="row-main">' +
-            '<div class="row-name"><b>' + esc(e.name) + "</b><em>" + count + " 则神迹</em></div>" +
+            '<div class="row-name"><b>' + esc(e.name) + "</b><em>" + count + " 则神迹</em>" +
+              '<span class="field-tag cat-tag">' + esc(e.category) + "</span></div>" +
             '<div class="row-desc">' + esc(e.deeds[0]) + "</div>" +
           "</div>" +
           '<div class="row-author"><span>记录人</span><b>' + esc(e.author) + "</b>" +
@@ -337,6 +364,7 @@
 
     $("#randomBtn").hidden = results.length === 0;
     $("#resultCount").textContent = loading ? "加载中…" : "共 " + results.length + " 位";
+    renderCatFilter();
 
     if (loading) { body.innerHTML = loadingHTML(); return; }
     if (loadError) { body.innerHTML = errorHTML(); return; }
@@ -396,6 +424,7 @@
           "<div>" +
             '<div class="featured-top" style="margin-bottom:8px;">' +
               '<span class="badge badge-s">NO.' + String(rank).padStart(3, "0") + "</span>" +
+              '<span class="field-tag cat-tag">' + esc(e.category) + "</span>" +
               '<span class="field-tag">收录于 ' + esc(U.fmtDate(e.createdAt)) + "</span>" +
             "</div>" +
             '<h3 id="modalTitle">' + esc(e.name) + "</h3>" +
@@ -475,6 +504,13 @@
     state.query = ev.target.value;
     renderBoard();
   }, 90));
+
+  $("#catFilter").addEventListener("click", function (ev) {
+    var btn = ev.target.closest("button[data-cat]");
+    if (!btn) return;
+    state.cat = btn.getAttribute("data-cat");
+    renderBoard();
+  });
 
   $("#randomBtn").addEventListener("click", function () {
     if (!results.length) return;

@@ -39,6 +39,14 @@
     return out;
   }
 
+  // 分类：四班 / 其他班 / 老师
+  var CATEGORIES = ["四班", "其他班", "老师"];
+
+  function toCategory(value) {
+    var c = String(value == null ? "" : value).trim();
+    return CATEGORIES.indexOf(c) > -1 ? c : "四班";
+  }
+
   function toEntry(raw) {
     if (!raw || typeof raw !== "object") return null;
     var name = clean(raw.name, 16);
@@ -58,6 +66,7 @@
       author: author,
       deeds: deeds,
       status: status,
+      category: toCategory(raw.category),
       createdAt: d.toISOString(),
       reviewedAt: raw.reviewedAt ? new Date(raw.reviewedAt).toISOString() : null
     };
@@ -264,7 +273,13 @@
     submit: function (payload) {
       return apiFetch("/entries", {
         method: "POST",
-        body: { name: payload.name, deeds: payload.deeds, author: payload.author, code: payload.code }
+        body: {
+          name: payload.name,
+          deeds: payload.deeds,
+          author: payload.author,
+          code: payload.code,
+          category: toCategory(payload.category)
+        }
       }).then(function (data) {
         return { ok: true, entry: toEntry(data.entry) || {} };
       });
@@ -325,6 +340,8 @@
     fmtDate: fmtDate,
     fmtShort: fmtShort,
     pad2: pad2,
-    toDeeds: toDeeds
+    toDeeds: toDeeds,
+    CATEGORIES: CATEGORIES.slice(),
+    toCategory: toCategory
   };
 })(window);

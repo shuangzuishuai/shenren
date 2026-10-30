@@ -56,6 +56,16 @@
         <p class="err">请填写神人名字</p>
       </div>
 
+      <div class="field" id="fieldCat">
+        <label><span>分类 <i>*</i></span><span id="cCat">四班</span></label>
+        <div class="seg" id="catPick" style="margin:0" role="group" aria-label="选择分类">
+          <button type="button" data-cat="四班" aria-pressed="true">四班</button>
+          <button type="button" data-cat="其他班" aria-pressed="false">其他班</button>
+          <button type="button" data-cat="老师" aria-pressed="false">老师</button>
+        </div>
+        <p class="hint">这位神人是谁？本班同学选「四班」，别的班选「其他班」，老师选「老师」。</p>
+      </div>
+
       <div class="field" id="fieldDeed">
         <label for="fDeed"><span>神人事迹 <i>*</i></span><span id="cDeed">0 字</span></label>
         <textarea id="fDeed" name="deeds" rows="6" maxlength="2000" placeholder="一行写一条，可以写多条。&#10;例如：&#10;连续三节数学课未被点名，疑似修成分身术。&#10;上课铃响即入定，下课铃响即醒。"></textarea>
@@ -93,7 +103,7 @@
         <div class="featured-inner">
           <div class="avatar avatar-lg" id="pvAvatar" aria-hidden="true">?</div>
           <div class="featured-main">
-            <div class="featured-top"><span class="badge badge-s">最新收录</span></div>
+            <div class="featured-top"><span class="badge badge-s">最新收录</span><span class="field-tag" id="pvCat">四班</span></div>
             <h3 id="pvName">神人名字</h3>
             <p class="desc" id="pvDeed">写下他干过的事，这里会实时显示。</p>
             <div class="featured-foot">
@@ -161,6 +171,26 @@
   var fieldCode = $("#fieldCode");
 
   var submitting = false;
+  var pickedCat = "四班";
+
+  /* ---------------- 分类选择 ---------------- */
+
+  var catPick = $("#catPick");
+
+  function setCategory(cat) {
+    pickedCat = U.toCategory(cat);
+    var buttons = catPick.querySelectorAll("button");
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute("aria-pressed", String(buttons[i].getAttribute("data-cat") === pickedCat));
+    }
+    $("#cCat").textContent = pickedCat;
+    $("#pvCat").textContent = pickedCat;
+  }
+
+  catPick.addEventListener("click", function (ev) {
+    var btn = ev.target.closest("button[data-cat]");
+    if (btn) setCategory(btn.getAttribute("data-cat"));
+  });
 
   /* ---------------- 计数与预览 ---------------- */
 
@@ -218,7 +248,7 @@
     if (authorBad) { fAuthor.focus(); return null; }
     if (codeBad) { fCode.focus(); return null; }
 
-    return { name: name, deeds: deeds, author: author, code: code };
+    return { name: name, deeds: deeds, author: author, code: code, category: pickedCat };
   }
 
   /* ---------------- Toast ---------------- */
@@ -328,6 +358,7 @@
       [fieldName, fieldDeed, fieldAuthor, fieldCode].forEach(function (f) {
         f.classList.remove("is-invalid");
       });
+      setCategory("四班");
       hideNote();
       syncPreview();
     }, 0);

@@ -369,6 +369,10 @@ img{max-width:100%;display:block;}
   font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--muted);
   padding:3px 9px;border:1px solid var(--line);border-radius:2px;
 }
+.cat-tag{
+  color:#ff9b9b;border-color:rgba(224,36,44,.35);background:rgba(224,36,44,.10);
+}
+.row-name .cat-tag{vertical-align:.15em;}
 .featured h3{
   font-family:var(--serif);font-size:clamp(30px,3.6vw,44px);font-weight:700;line-height:1.15;
   letter-spacing:.02em;
@@ -777,7 +781,7 @@ footer{
    ============================================================ */
 
 .board-note{
-  margin:-10px 0 20px;
+  margin:2px 0 20px;
   font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:#6a6460;
 }
 

@@ -211,6 +211,7 @@
           '<div class="admin-main">' +
             '<div class="admin-title">' +
               "<b>" + esc(e.name) + "</b>" +
+              '<span class="field-tag cat-tag">' + esc(e.category) + "</span>" +
               '<span class="status status-' + e.status + '">' + statusLabel(e.status) + "</span>" +
             "</div>" +
             '<div class="admin-meta">记录人 ' + esc(e.author) + " · 提交于 " + esc(U.fmtShort(e.createdAt)) + "</div>" +
@@ -294,7 +295,7 @@
       version: 2,
       exportedAt: new Date().toISOString(),
       entries: all.map(function (e) {
-        return { name: e.name, author: e.author, deeds: e.deeds, status: e.status, createdAt: e.createdAt };
+        return { name: e.name, author: e.author, deeds: e.deeds, status: e.status, category: e.category, createdAt: e.createdAt };
       })
     };
 

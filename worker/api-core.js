@@ -13,9 +13,18 @@
 
 const RATE_WINDOW_MS = 30 * 1000;
 
+// 分类标签：四班 / 其他班 / 老师
+const CATEGORIES = ["四班", "其他班", "老师"];
+const DEFAULT_CATEGORY = "四班";
+
+function normalizeCategory(value) {
+  const c = String(value == null ? "" : value).trim();
+  return CATEGORIES.includes(c) ? c : DEFAULT_CATEGORY;
+}
+
 // 首次打开 /api/setup 时执行，自动建表；可重复执行，不会影响已有数据
 const SCHEMA_STATEMENTS = [
-  "CREATE TABLE IF NOT EXISTS entries (id TEXT PRIMARY KEY, name TEXT NOT NULL, author TEXT NOT NULL, deeds TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created_at INTEGER NOT NULL, reviewed_at INTEGER, ip_hash TEXT)",
+  "CREATE TABLE IF NOT EXISTS entries (id TEXT PRIMARY KEY, name TEXT NOT NULL, author TEXT NOT NULL, deeds TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created_at INTEGER NOT NULL, reviewed_at INTEGER, ip_hash TEXT, category TEXT NOT NULL DEFAULT '四班')",
   "CREATE INDEX IF NOT EXISTS idx_entries_status ON entries (status, created_at DESC)",
   "CREATE TABLE IF NOT EXISTS rate (ip TEXT PRIMARY KEY, at INTEGER NOT NULL)"
 ];
@@ -34,14 +43,27 @@ export async function handleApi(request, env) {
     const path = url.pathname.replace(/^\/api/, "") || "/";
     const method = request.method.toUpperCase();
 
-    // 一键建表：浏览器打开 /api/setup 即可，可重复执行
+    // 一键建表 + 老库补字段：浏览器打开 /api/setup 即可，可重复执行
     if (path === "/setup") {
       await env.DB.batch(SCHEMA_STATEMENTS.map((sql) => env.DB.prepare(sql)));
+
+      let addedColumn = false;
+      try {
+        const info = await env.DB.prepare("PRAGMA table_info(entries)").all();
+        const cols = (info.results || []).map((row) => row.name);
+        if (cols.length && !cols.includes("category")) {
+          await env.DB.prepare("ALTER TABLE entries ADD COLUMN category TEXT NOT NULL DEFAULT '四班'").run();
+          addedColumn = true;
+        }
+      } catch (e) {
+        console.error("[shenren-api] 补列失败", e);
+      }
+
       const tables = await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
       const names = (tables.results || [])
         .map((row) => row.name)
         .filter((n) => n === "entries" || n === "rate");
-      return ok(env, { message: "数据库已就绪", tables: names });
+      return ok(env, { message: "数据库已就绪", tables: names, addedCategory: addedColumn });
     }
 
     if (path === "/entries") {
@@ -101,6 +123,7 @@ async function submit(request, env) {
   const name = cleanText(body.name, 16);
   const author = cleanText(body.author, 16);
   const deeds = parseDeeds(body.deeds);
+  const category = normalizeCategory(body.category);
 
   if (!name || !author) return fail(env, "名字和作者都要填");
   if (!deeds.length) return fail(env, "至少写一条事迹");
@@ -116,12 +139,12 @@ async function submit(request, env) {
   const now = Date.now();
 
   await env.DB
-    .prepare("INSERT INTO entries (id, name, author, deeds, status, created_at, ip_hash) VALUES (?, ?, ?, ?, ?, ?, ?)")
-    .bind(id, name, author, JSON.stringify(deeds), "pending", now, ipHash)
+    .prepare("INSERT INTO entries (id, name, author, deeds, status, created_at, ip_hash, category) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+    .bind(id, name, author, JSON.stringify(deeds), "pending", now, ipHash, category)
     .run();
 
   return ok(env, {
-    entry: { id, name, author, deeds, status: "pending", createdAt: new Date(now).toISOString() }
+    entry: { id, name, author, deeds, status: "pending", category, createdAt: new Date(now).toISOString() }
   });
 }
 
@@ -268,6 +291,7 @@ function toClient(row) {
     author: row.author,
     deeds,
     status: row.status,
+    category: normalizeCategory(row.category),
     createdAt: new Date(Number(row.created_at)).toISOString(),
     reviewedAt: row.reviewed_at ? new Date(Number(row.reviewed_at)).toISOString() : null
   };
