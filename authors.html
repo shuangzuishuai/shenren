@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>作者档案 · 四班神人榜</title>
+<meta name="description" content="四班·聊斋志异 的四位作者档案。" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .dossier-hero{padding:60px 0 36px;}
+  .dossier-title{
+    margin-top:18px;font-family:var(--serif);font-weight:900;
+    font-size:clamp(44px,7vw,78px);line-height:1;letter-spacing:.04em;
+    background:linear-gradient(178deg,#fff 0%,#ffe9e9 40%,#ff6b6b 72%,#b01a22 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 34px rgba(224,36,44,.28));
+  }
+  .dossier-lede{margin-top:16px;max-width:56ch;color:var(--text-2);font-size:14.5px;line-height:1.95;}
+  .dossier-lede em{font-style:normal;color:#fff;border-bottom:1px solid rgba(224,36,44,.5);}
+
+  .dossier-stats-bar{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    margin-bottom:34px;
+  }
+  .dossier-stats-bar div{padding:22px 8px 22px 0;}
+  .dossier-stats-bar div + div{padding-left:26px;border-left:1px solid var(--line);}
+  .dossier-stats-bar b{
+    display:block;font-family:var(--serif);font-size:min(38px,4vw);line-height:1;
+    font-variant-numeric:tabular-nums;color:#fff;
+  }
+  .dossier-stats-bar b small{font-size:.42em;color:var(--muted);font-family:var(--mono);margin-left:4px;}
+  .dossier-stats-bar span{
+    display:block;margin-top:9px;font-family:var(--mono);font-size:10px;
+    letter-spacing:.22em;color:var(--muted);
+  }
+  .dossier-stats-bar div:nth-child(2) b{color:var(--red-bright);}
+
+  .dossier-list{display:flex;flex-direction:column;gap:16px;}
+  .dossier{
+    position:relative;overflow:hidden;
+    border:1px solid var(--line);border-radius:4px;
+    background:linear-gradient(160deg,#121014 0%, #0b0b0e 72%);
+    padding:26px 28px 24px;
+    transition:border-color .3s var(--ease);
+  }
+  .dossier:hover{border-color:rgba(224,36,44,.4);}
+  .dossier-num{
+    position:absolute;right:18px;top:-6px;
+    font-family:var(--serif);font-weight:900;font-size:clamp(80px,9vw,120px);line-height:1;
+    color:transparent;-webkit-text-stroke:1.2px rgba(224,36,44,.22);
+    pointer-events:none;user-select:none;letter-spacing:-.02em;
+  }
+  .dossier-head{position:relative;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+  .dossier-head .avatar{width:58px;height:58px;font-size:23px;}
+  .dossier-name{
+    font-family:var(--serif);font-size:26px;font-weight:700;letter-spacing:.04em;line-height:1.2;
+  }
+  .dossier-name em{
+    font-style:normal;font-family:var(--sans);font-size:12px;font-weight:400;
+    color:var(--muted);letter-spacing:.14em;margin-left:.7em;vertical-align:.15em;
+  }
+  .dossier-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;}
+  .dossier-tags .field-tag{font-size:9.5px;padding:2px 8px;}
+
+  .dossier-bio{
+    position:relative;margin-top:18px;font-size:14px;line-height:2.05;color:var(--text-2);
+    max-width:70ch;
+  }
+  .dossier-foot{
+    position:relative;margin-top:20px;padding-top:16px;
+    border-top:1px dashed rgba(255,255,255,.07);
+    display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  }
+  .dossier-count{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--muted);}
+  .dossier-count b{color:var(--red-bright);font-weight:600;}
+
+  .dossier-note{
+    margin-top:40px;padding:18px 20px;border-radius:4px;
+    border:1px solid var(--line);background:rgba(255,255,255,.02);
+    font-size:12.5px;color:var(--muted);line-height:1.8;
+  }
+  .dossier-note b{color:var(--text-2);font-weight:500;}
+
+  .entry-list{display:flex;flex-direction:column;gap:16px;margin-top:4px;}
+  .entry-list article{border-left:2px solid rgba(224,36,44,.45);padding-left:14px;}
+  .entry-list .e-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .entry-list b{font-family:var(--serif);font-size:15px;font-weight:700;}
+  .entry-list time{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted);}
+  .entry-list p{margin-top:4px;font-size:12.5px;color:#8b8580;line-height:1.75;}
+
+  @media (max-width:720px){
+    .dossier-hero{padding:36px 0 26px;}
+    .dossier{padding:20px 18px 18px;}
+    .dossier-head{gap:14px;}
+    .dossier-head .avatar{width:48px;height:48px;font-size:19px;}
+    .dossier-name{font-size:22px;}
+    .dossier-name em{display:block;margin-left:0;margin-top:4px;font-size:10.5px;}
+    .dossier-bio{font-size:13px;line-height:1.95;}
+    .dossier-num{font-size:72px;top:0;right:12px;}
+    .dossier-stats-bar b{font-size:26px;}
+    .dossier-stats-bar span{font-size:8.5px;letter-spacing:.14em;}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-aura" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-dot" aria-hidden="true"></span>
+      <span class="brand-name">四班 · <b>神人榜</b></span>
+    </a>
+    <nav class="nav-links" aria-label="主导航">
+      <a href="index.html">本期榜单</a>
+      <a href="authors.html">作者档案</a>
+      <a href="submit.html">上传神迹</a>
+    </nav>
+    <div class="nav-right">
+      <span class="issue">第 <b>01</b> 期</span>
+      <a class="btn btn-primary btn-sm" href="submit.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        我要投稿
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="dossier-hero">
+    <p class="eyebrow">四班 · 聊斋志异 · <b>作者档案</b></p>
+    <h1 class="dossier-title">四位作者</h1>
+    <p class="dossier-lede">
+      这本《聊斋志异》只有四位记录者。他们负责看见、追踪、并且<em>活着写下来</em>。
+      以下档案由编辑部维护，投稿无法修改。
+    </p>
+  </section>
+
+  <section class="dossier-stats-bar" aria-label="作者统计">
+    <div><b id="sAuthors">4</b><span>在册作者</span></div>
+    <div><b id="sEntries">0</b><span>上榜记录</span></div>
+    <div><b id="sDeeds">0</b><span>神迹总量</span></div>
+  </section>
+
+  <div class="dossier-list" id="dossierList"></div>
+
+  <p class="dossier-note">
+    <b>关于档案：</b>本页内容为固定文案，由管理员直接维护；投稿时填写的"作者 / 记录人"只用于署名，
+    不会改动这里的任何文字。若档案有误或需要更新，找管理员改页面本身。
+  </p>
+</main>
+
+<footer>
+  <div class="wrap foot-inner">
+    <div>
+      <div class="foot-brand">四班<span>·</span>聊斋志异</div>
+      <p class="foot-note">
+        档案中的经历均来自本人叙述，本页只负责记录，不负责证明。
+      </p>
+    </div>
+    <div class="foot-meta">
+      AUTHORS / EDITION 01<br />
+      RECORDED IN CLASS 4
+    </div>
+  </div>
+</footer>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal-box" role="document">
+    <button class="modal-close" id="modalClose" type="button" aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="app-data.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var API = window.ShenrenAPI;
+  var U = window.ShenrenUtil;
+  var esc = U.escapeHTML;
+
+  var $ = function (sel) { return document.querySelector(sel); };
+
+  /* ---------------- 四位作者（固定档案，投稿无法修改） ---------------- */
+  var AUTHORS = [
+    {
+      alias: "司马明",
+      realName: "周健明",
+      note: "（bushi）",
+      tags: ["猎鬼师", "紫袍道士", "作家"],
+      bio: "就读于广州四中。曾经在背身鬼的袭击下生还。自那以后，爱上猎杀非自然生物，为人正直，多次使用举报信向江寿举报初一若只。后期遭到背身鬼点头精神攻击，大脑受到重创，于是每次见到了马上跑路，后来更是进化出老兵直觉：不仅在马上遇到足球攻击时反应棍木，还在背身鬼探测到周健明时杀意感知，立马跑出 4343 米。"
+    },
+    {
+      alias: "司马葱",
+      realName: "蔡小葱",
+      note: "（半黄鬼人间体）",
+      tags: ["诡异记录员", "诡异观测员", "UMA"],
+      bio: "就读于广州四中汽修四班。从小被半黄鬼附体觉醒阴阳眼。后加入 UMA 调查机构（unknown mysterial animals），击败大肉帮帮主，后因个人原因脱离机构。曾与背身鬼搏斗、缠斗，并在其追踪下成功逃脱，但同时也受到了重伤。在与初二女鬼进行长达 67 秒战斗后奄奄一息，后来询问喷水鬼：「你们是几班的？」被其追赶，嘴里还嘟囔着：「你们在玩游戏吗？」被追赶喷死，经抢救无效，于 2091 年 78 月 67 日不幸离世。"
+    },
+    {
+      alias: "司马冰",
+      realName: "陈冰冰",
+      note: "",
+      tags: ["诡异观测员", "鬼怪事物记录者"],
+      bio: "曾经直面于初一弱智的点头攻击并全身而退。尝试跳跃至传说中的第五根杆，失败后被打击为狮身人面像，心灵受到打击，退居二线。著作《聊斋志异》《史记》等。现也会观测一些无危险的鬼怪事物，比如撬门鬼、泼沙鬼，永远不会写「惊鸿一piě」之人。"
+    },
+    {
+      alias: "司马水",
+      realName: "冯水水",
+      note: "",
+      tags: ["诡异记录者", "第三类事物接触者"],
+      bio: "曾经多次与初一外星生物采访并多次发动神技无甚大碍。在四中尝试开创跳楼项目，最终失败。直面 EGG.limo 选手跑打和跳 peek，在一摊摊黄色液体中无装备无辅助安然无恙逃出生天。因身心疲惫，回去二线，作品《聊斋志异》。现会观测一些职业选手训练赛，比如跑打、跨栏和袋鼠跳。"
+    }
+  ];
+
+  var byAuthor = {};
+  var lastFocused = null;
+  var modal = $("#modal");
+
+  function initialOf(name) {
+    var s = String(name || "?").trim();
+    return s ? s.charAt(0) : "?";
+  }
+
+  function entriesOf(alias) {
+    return byAuthor[alias] || [];
+  }
+
+  function renderStats() {
+    var entries = 0;
+    var deeds = 0;
+    AUTHORS.forEach(function (a) {
+      var list = entriesOf(a.alias);
+      entries += list.length;
+      list.forEach(function (e) { deeds += e.deeds.length; });
+    });
+    $("#sEntries").innerHTML = entries + "<small>条</small>";
+    $("#sDeeds").innerHTML = deeds + "<small>则</small>";
+  }
+
+  function dossierHTML(a, i) {
+    var list = entriesOf(a.alias);
+    var deeds = list.reduce(function (n, e) { return n + e.deeds.length; }, 0);
+
+    var count = list.length
+      ? "上榜 <b>" + list.length + "</b> 条 · <b>" + deeds + "</b> 则神迹"
+      : "暂无上榜记录";
+
+    return '' +
+      '<article class="dossier">' +
+        '<div class="dossier-num" aria-hidden="true">0' + (i + 1) + "</div>" +
+        '<div class="dossier-head">' +
+          '<div class="avatar" aria-hidden="true">' + esc(initialOf(a.alias)) + "</div>" +
+          "<div>" +
+            '<div class="dossier-name">' + esc(a.alias) +
+              "<em>原名 " + esc(a.realName) + esc(a.note || "") + "</em></div>" +
+            '<div class="dossier-tags">' +
+              a.tags.map(function (t) { return '<span class="field-tag">' + esc(t) + "</span>"; }).join("") +
+            "</div>" +
+          "</div>" +
+        "</div>" +
+        '<p class="dossier-bio">' + esc(a.bio) + "</p>" +
+        '<div class="dossier-foot">' +
+          '<span class="dossier-count">' + count + "</span>" +
+          '<button class="btn btn-ghost btn-sm" type="button" data-author="' + i + '"' +
+            (list.length ? "" : " disabled") + ">查看他写的条目</button>" +
+        "</div>" +
+      "</article>";
+  }
+
+  function renderList() {
+    $("#dossierList").innerHTML = AUTHORS.map(dossierHTML).join("");
+    renderStats();
+  }
+
+  function openModal(index) {
+    var a = AUTHORS[index];
+    if (!a) return;
+    var list = entriesOf(a.alias);
+    if (!list.length) return;
+
+    $("#modalContent").innerHTML = '' +
+      '<div class="modal-top">' +
+        '<div class="modal-id">' +
+          '<div class="avatar avatar-lg" aria-hidden="true">' + esc(initialOf(a.alias)) + "</div>" +
+          "<div>" +
+            '<div class="featured-top" style="margin-bottom:8px;">' +
+              '<span class="badge badge-s">作者</span>' +
+              '<span class="field-tag">' + list.length + " 条记录</span>" +
+            "</div>" +
+            '<h3 id="modalTitle">' + esc(a.alias) + "</h3>" +
+          "</div>" +
+        "</div>" +
+      "</div>" +
+      '<div class="modal-body">' +
+        '<div class="entry-list">' +
+          list.map(function (e) {
+            return '' +
+              "<article>" +
+                '<div class="e-top"><b>' + esc(e.name) + '</b><span class="field-tag cat-tag">' + esc(e.category) + "</span>" +
+                  "<time>" + esc(U.fmtDate(e.createdAt)) + "</time></div>" +
+                "<p>" + esc(e.deeds[0]) + "</p>" +
+              "</article>";
+          }).join("") +
+        "</div>" +
+      "</div>";
+
+    lastFocused = document.activeElement;
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("is-locked");
+    $("#modalClose").focus();
+  }
+
+  function closeModal() {
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("is-locked");
+    if (lastFocused && lastFocused.focus) lastFocused.focus();
+  }
+
+  document.addEventListener("click", function (ev) {
+    var btn = ev.target.closest("[data-author]");
+    if (btn) { openModal(Number(btn.getAttribute("data-author"))); return; }
+    if (ev.target.closest("#modalClose")) closeModal();
+  });
+
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape" && modal.classList.contains("is-open")) closeModal();
+  });
+
+  modal.addEventListener("click", function (ev) { if (ev.target === modal) closeModal(); });
+
+  /* ---------------- 载入榜单数据，只统计这四位 ---------------- */
+  AUTHORS.forEach(function (a) { byAuthor[a.alias] = []; });
+
+  function collect(entries) {
+    AUTHORS.forEach(function (a) { byAuthor[a.alias] = []; });
+
+    entries.forEach(function (e) {
+      AUTHORS.forEach(function (a) {
+        if (e.author.indexOf(a.alias) > -1) byAuthor[a.alias].push(e);
+      });
+    });
+
+    AUTHORS.forEach(function (a) {
+      byAuthor[a.alias].sort(function (x, y) {
+        return new Date(y.createdAt) - new Date(x.createdAt);
+      });
+    });
+
+    renderList();
+  }
+
+  renderList();
+
+  API.list().then(collect, function () {
+    renderList();
+  });
+})();
+</script>
+</body>
+</html>
