@@ -82,6 +82,36 @@
   }
   .dossier-note b{color:var(--text-2);font-weight:500;}
 
+  .epilogue{
+    position:relative;overflow:hidden;margin-top:46px;
+    padding:36px 34px 34px;border-radius:4px;
+    border:1px solid rgba(224,36,44,.32);
+    background:
+      radial-gradient(560px 220px at 6% -25%, rgba(224,36,44,.16), transparent 70%),
+      linear-gradient(160deg,#131013 0%, #0b0b0e 72%);
+    box-shadow:0 40px 90px -60px rgba(224,36,44,.6);
+  }
+  .epilogue::before{
+    content:"記";position:absolute;right:-6px;bottom:-52px;
+    font-family:var(--serif);font-size:190px;line-height:1;font-weight:900;
+    color:transparent;-webkit-text-stroke:1px rgba(224,36,44,.12);
+    pointer-events:none;user-select:none;
+  }
+  .epilogue h2{
+    position:relative;margin-top:12px;
+    font-family:var(--serif);font-size:clamp(24px,3vw,32px);font-weight:700;letter-spacing:.06em;
+  }
+  .epilogue p{
+    position:relative;margin-top:16px;max-width:66ch;
+    font-size:14.5px;line-height:2.15;color:var(--text-2);
+  }
+  .epilogue p strong{color:#fff;font-weight:600;}
+  .epilogue p code{
+    font-family:var(--mono);font-size:12.5px;color:#ffb3b3;
+    background:rgba(224,36,44,.12);border:1px solid rgba(224,36,44,.3);
+    padding:1px 7px;border-radius:2px;letter-spacing:.06em;
+  }
+
   .entry-list{display:flex;flex-direction:column;gap:16px;margin-top:4px;}
   .entry-list article{border-left:2px solid rgba(224,36,44,.45);padding-left:14px;}
   .entry-list .e-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
@@ -148,6 +178,19 @@
   </section>
 
   <div class="dossier-list" id="dossierList"></div>
+
+  <section class="epilogue">
+    <p class="eyebrow">EPILOGUE · <b>后记</b></p>
+    <h2>为何都姓司马</h2>
+    <p>
+      四人均受到了极其恐怖的精神攻击，团结起来创造出《聊斋志异》，记录妖魔鬼怪，以供后人参考。
+      也正是那场攻击，激发出各自的写作能力。
+    </p>
+    <p>
+      他们改名「司马」姓氏，原因是四人找到了<strong>司马绝学</strong>——
+      但前置条件是必须 <code>silema</code>。所以他们全都改姓司马，<strong>为艺术献身</strong>。
+    </p>
+  </section>
 
   <p class="dossier-note">
     <b>关于档案：</b>本页内容为固定文案，由管理员直接维护；投稿时填写的"作者 / 记录人"只用于署名，
